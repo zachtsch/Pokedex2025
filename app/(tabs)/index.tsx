@@ -1,74 +1,85 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { ScrollView, View, Text, Image, FlatList, StyleSheet } from "react-native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const PokemonList = () => {
+  const [pokemonList, setPokemonList] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [nextPage, setNextPage] = useState(1); // Start fetching from ID 1
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  // Function to fetch Pokémon data
+  const fetchPokemon = async (startId, endId) => {
+    setLoading(true);
+    const newPokemon = [];
+    for (let id = startId; id <= endId; id++) {
+      try {
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        const data = await response.json();
+        newPokemon.push(data);
+      } catch (error) {
+        console.error("Error fetching Pokémon:", error);
+      }
+    }
+    setPokemonList((prev) => [...prev, ...newPokemon]); // Append new Pokémon to the list
+    setLoading(false);
+  };
+
+  // Initial fetch (first 20 Pokémon)
+  useEffect(() => {
+    fetchPokemon(nextPage, nextPage + 19);
+    setNextPage(nextPage + 20);
+  }, []);
+
+  // Load more Pokémon when the user scrolls to the end
+  const loadMorePokemon = () => {
+    if (!loading) {
+      fetchPokemon(nextPage, nextPage + 19);
+      setNextPage(nextPage + 20);
+    }
+  };
+
+  // Render each Pokémon item
+  const renderPokemon = ({ item }) => (
+    <View style={styles.dataContainer}>
+      <Text>#{item.id} {item.name}</Text>
+      <Image
+        source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${item.id}.png` }}
+        style={styles.image}
+      />
+      <Text>
+        {item.types
+          .map((typeInfo) => typeInfo.type.name) // Extract type names
+          .join("/")} {/* Join multiple types with a slash */}
+      </Text>
+    </View>
   );
-}
+
+  return (
+    //Question: How to get this centered with either View or ScrollView?
+    //<ScrollView /*style={{alignItems:'center'}}*/>
+    <FlatList
+      numColumns={3}
+      data={pokemonList}
+      renderItem={renderPokemon}
+      keyExtractor={(item) => item.id.toString()} // Use Pokémon ID as the key
+      onEndReached={loadMorePokemon} // Load more Pokémon when the user scrolls to the end
+      onEndReachedThreshold={0.5} // Trigger loadMorePokemon when the user is halfway through the list
+      ListFooterComponent={() => loading && <Text>Loading...</Text>} // Show a loading indicator
+    />
+    //</ScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  dataContainer: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    alignItems: "center",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  image: {
+    width: 100,
+    height: 100,
   },
 });
+
+export default PokemonList;
