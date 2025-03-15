@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Image, View, TextInput, Button, Alert, StyleSheet, Text } from 'react-native';
 
-const HomeScreen = () => {
+function HomeScreen(){
   const [pokemonName, setPokemonName] = useState(''); // State to store the input value
   const [pokemonData, setPokemonData] = useState(null); // State to store the fetched data
 
@@ -59,7 +59,7 @@ async function returnPokeApi(name) {
     console.log(json);
     return json; // Return the JSON data
   } catch (error) {
-    console.error(error.message);
+    console.error("Error fetching Pokémon:", error);
     throw error; // Re-throw the error
   }
 }
