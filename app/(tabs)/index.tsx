@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView, View, Text, Image, FlatList, StyleSheet } from "react-native";
+import { View, Text, Image, FlatList, StyleSheet } from "react-native";
 
 
 export default function PokemonList(){
@@ -41,7 +41,8 @@ export default function PokemonList(){
     }
   };
 
-  function findBackground(type : string){
+
+  function findBackgroundColor(type : string){
     const typeColors : any = {
       normal: '#A8A878',
       fighting: '#C03028',
@@ -64,29 +65,40 @@ export default function PokemonList(){
                       }
     return typeColors[type]
   }
+
+  function findSecondBackground(types : Array<any>){
+    if (types.length == 1){
+      return findBackgroundColor(types[0].type.name)}
+    else {
+      return findBackgroundColor(types[1].type.name)
+    }
+  }
   
 
   // Render each Pokémon item
   const renderPokemon = ({ item } : any) => (
-    <View style={{width: 250, height: 250, padding: 5, margin: 5,
-      alignItems: "center", borderWidth: 3, borderRadius: 30, backgroundColor: findBackground(item.types[0].type.name)}}>
-        <Text style={styles.id}>#{item.id}</Text>
-        <Image
-          source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${item.id}.png` }}
-          style={styles.image}
-        />
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.type}>
-          {item.types
-            .map((typeInfo : any) => typeInfo.type.name) // Extract type names
-            .join(" / ")} 
-        </Text>
+    <View style={[styles.dataContainer, {backgroundColor: findBackgroundColor(item.types[0].type.name)}]}>
+        <View style={[styles.otherHalf,{borderBottomColor: findSecondBackground(item.types)}]}></View>
+        <Text style={styles.id}>#{String(item.id).padStart(4, '0')}</Text>
+        <View style={styles.descriptionContainer}>
+          <Image
+            source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${item.id}.png` }}
+            style={styles.image}
+          />
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.type}>
+            {item.types
+              .map((typeInfo : any) => typeInfo.type.name) // Extract type names
+              .join(" / ")} 
+          </Text>
+        </View>
     </View>
   );
 
 
   return (
     <View style={styles.pokeContainer}>
+      <Text style={styles.title}>Pokédex</Text>
       <FlatList
         numColumns={3}
         data={pokemonList}
@@ -101,10 +113,27 @@ export default function PokemonList(){
 };
 
 const styles = StyleSheet.create({
+  title: {
+       fontSize: 40,
+       fontWeight: 'bold'
+  },
   pokeContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: 'white'
+  },
+  descriptionContainer: {
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  otherHalf:{
+    position: 'absolute',
+    borderRadius: 40,
+    borderLeftWidth: 250,
+    borderBottomWidth: 250,
+    borderLeftColor: 'transparent',
+    bottom: 0,
   },
   dataContainer: {
     width: 250,
@@ -112,18 +141,19 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 5,
     alignItems: "center",
-    borderWidth: 3,
-    borderRadius: 30,
-    backgroundColor: 'green'
-    
+    borderRadius: 40,
   },
   image: {
     width: 150,
     height: 150,
+    padding: 0,
+    margin: 0
   },
   id:{
     fontSize: 18,
-    fontWeight: 'bold'
+    textAlign: 'left',
+    width: 210,
+    paddingTop: 10,
   },
   name:{
     textTransform: 'uppercase',
@@ -131,7 +161,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   type:{
-    color: 'white',
-    fontSize: 18
+    fontSize: 18,
   }
 });
