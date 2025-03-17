@@ -1,74 +1,166 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { View, Text, Image, FlatList, StyleSheet } from "react-native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+export default function PokemonList(){
+  const [pokemonList, setPokemonList] = useState<any>([]);
+  const [loading, setLoading] = useState(false);
+  const [nextPage, setNextPage] = useState(1);
+
+
+  // Appends the json of each pokemon, in the range startId-endId, to pokemonList
+  async function fetchPokemon(startId : number, endId : number){
+    setLoading(true);
+    const newPokemon : any[] = [];
+    for (let id = startId; id <= endId; id++) {
+      try {
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        const data = await response.json();
+        newPokemon.push(data);
+      } catch (error) {
+        console.error("Error fetching Pokémon:", error);
+      }
+    }
+    setPokemonList((prev : any[]) => [...prev, ...newPokemon]);
+    setLoading(false);
+  };
+
+
+  // Initial fetch (first 20 Pokémon)
+  useEffect(() => {
+    fetchPokemon(nextPage, nextPage + 19);
+    setNextPage(nextPage + 20);
+  }, []);
+
+
+  // Load more Pokémon when the user scrolls to the end
+  const loadMorePokemon = () => {
+    if (!loading) {
+      fetchPokemon(nextPage, nextPage + 19);
+      setNextPage(nextPage + 20);
+    }
+  };
+
+
+  function findBackgroundColor(type : string){
+    const typeColors : any = {
+      normal: '#A8A878',
+      fighting: '#C03028',
+      flying: '#A890F0',
+      poison: '#A040A0',
+      ground: '#E0C068',
+      rock: '#B8A038',
+      bug: '#A8B820',
+      ghost: '#705898',
+      steel: '#B8B8D0',
+      fire: '#F08030',
+      water: '#6890F0',
+      grass: '#78C850',
+      electric: '#F8D030',
+      psychic: '#F85888',
+      ice: '#98D8D8',
+      dragon: '#7038F8',
+      dark: '#705848',
+      fairy: '#EE99AC'
+                      }
+    return typeColors[type]
+  }
+
+  function findSecondBackground(types : Array<any>){
+    if (types.length == 1){
+      return findBackgroundColor(types[0].type.name)}
+    else {
+      return findBackgroundColor(types[1].type.name)
+    }
+  }
+  
+
+  // Render each Pokémon item
+  const renderPokemon = ({ item } : any) => (
+    <View style={[styles.dataContainer, {backgroundColor: findBackgroundColor(item.types[0].type.name)}]}>
+        <View style={[styles.otherHalf,{borderBottomColor: findSecondBackground(item.types)}]}></View>
+        <Text style={styles.id}>#{String(item.id).padStart(4, '0')}</Text>
+        <View style={styles.descriptionContainer}>
+          <Image
+            source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${item.id}.png` }}
+            style={styles.image}
+          />
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.type}>
+            {item.types
+              .map((typeInfo : any) => typeInfo.type.name) // Extract type names
+              .join(" / ")} 
+          </Text>
+        </View>
+    </View>
   );
-}
+
+
+  return (
+    <View style={styles.pokeContainer}>
+      <Text style={styles.title}>Pokédex</Text>
+      <FlatList
+        numColumns={3}
+        data={pokemonList}
+        renderItem={renderPokemon}
+        keyExtractor={(item) => item.id.toString()} // Use Pokémon ID as the key
+        onEndReached={loadMorePokemon} // Load more Pokémon when the user scrolls to the end
+        onEndReachedThreshold={0.5} // Trigger loadMorePokemon when the user is halfway through the list
+        ListFooterComponent={() => loading && <Text>Loading...</Text>} // Show a loading indicator
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  title: {
+       fontSize: 40,
+       fontWeight: 'bold'
+  },
+  pokeContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    backgroundColor: 'white'
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  descriptionContainer: {
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  otherHalf:{
     position: 'absolute',
+    borderRadius: 40,
+    borderLeftWidth: 250,
+    borderBottomWidth: 250,
+    borderLeftColor: 'transparent',
+    bottom: 0,
   },
+  dataContainer: {
+    width: 250,
+    height: 250,
+    padding: 5,
+    margin: 5,
+    alignItems: "center",
+    borderRadius: 40,
+  },
+  image: {
+    width: 150,
+    height: 150,
+    padding: 0,
+    margin: 0
+  },
+  id:{
+    fontSize: 18,
+    textAlign: 'left',
+    width: 210,
+    paddingTop: 10,
+  },
+  name:{
+    textTransform: 'uppercase',
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  type:{
+    fontSize: 18,
+  }
 });
