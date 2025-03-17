@@ -77,8 +77,8 @@ export default function PokemonList(){
 
   // Render each Pokémon item
   const renderPokemon = ({ item } : any) => (
-    <View style={[styles.dataContainer, {backgroundColor: findBackgroundColor(item.types[0].type.name)}]}>
-        <View style={[styles.otherHalf,{borderBottomColor: findSecondBackground(item.types)}]}></View>
+    <View style={styles.dataContainer}>
+        <View style={[styles.mybackground,{borderLeftColor: findBackgroundColor(item.types[0].type.name), borderBottomColor: findSecondBackground(item.types)}]}></View>
         <Text style={styles.id}>#{String(item.id).padStart(4, '0')}</Text>
         <View style={styles.descriptionContainer}>
           <Image
@@ -127,12 +127,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  otherHalf:{
+  mybackground:{
     position: 'absolute',
-    borderRadius: 40,
+    borderRadius: 0,
     borderLeftWidth: 250,
     borderBottomWidth: 250,
-    borderLeftColor: 'transparent',
     bottom: 0,
   },
   dataContainer: {
@@ -141,7 +140,7 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 5,
     alignItems: "center",
-    borderRadius: 40,
+    borderRadius: 0,
   },
   image: {
     width: 150,
