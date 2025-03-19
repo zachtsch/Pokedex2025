@@ -3,25 +3,41 @@ import { View, Text, Image, FlatList, StyleSheet } from "react-native";
 
 
 export default function PokemonList(){
-  const [pokemonList, setPokemonList] = useState<any>([]);
+  const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
   const [loading, setLoading] = useState(false);
   const [nextPage, setNextPage] = useState(1);
+
+
+  type pokeType = {
+    type : {
+      name : string
+    }
+  }
+
+  interface Pokemon {
+    name : string;
+    id : string
+    sprites: {
+      front_default: string;
+    };
+    types : pokeType[]
+  }
 
 
   // Appends the json of each pokemon, in the range startId-endId, to pokemonList
   async function fetchPokemon(startId : number, endId : number){
     setLoading(true);
-    const newPokemon : any[] = [];
+    const newPokemon : Pokemon[] = [];
     for (let id = startId; id <= endId; id++) {
       try {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-        const data = await response.json();
+        const data : Pokemon = await response.json();
         newPokemon.push(data);
       } catch (error) {
         console.error("Error fetching Pokémon:", error);
       }
     }
-    setPokemonList((prev : any[]) => [...prev, ...newPokemon]);
+    setPokemonList((prev : Pokemon[]) => [...prev, ...newPokemon]);
     setLoading(false);
   };
 
@@ -42,8 +58,8 @@ export default function PokemonList(){
   };
 
 
-  function findBackgroundColor(type : string){
-    const typeColors : any = {
+  function findBackgroundColor(type : string) : string{
+    const typeColors : {[type : string] : string} = {
       normal: '#A8A878',
       fighting: '#C03028',
       flying: '#A890F0',
@@ -66,7 +82,7 @@ export default function PokemonList(){
     return typeColors[type]
   }
 
-  function findSecondBackground(types : Array<any>){
+  function findSecondBackground(types : Array<pokeType>){
     if (types.length == 1){
       return findBackgroundColor(types[0].type.name)}
     else {
@@ -75,8 +91,12 @@ export default function PokemonList(){
   }
   
 
+  type p = {
+    item : Pokemon
+  }
+
   // Render each Pokémon item
-  const renderPokemon = ({ item } : any) => (
+  const renderPokemon = ({ item } : {item : Pokemon}) => (
     <View style={styles.dataContainer}>
         <View style={[styles.mybackground,{borderLeftColor: findBackgroundColor(item.types[0].type.name), borderBottomColor: findSecondBackground(item.types)}]}></View>
         <Text style={styles.id}>#{String(item.id).padStart(4, '0')}</Text>
@@ -88,7 +108,7 @@ export default function PokemonList(){
           <Text style={styles.name}>{item.name}</Text>
           <Text style={styles.type}>
             {item.types
-              .map((typeInfo : any) => typeInfo.type.name) // Extract type names
+              .map((typeInfo) => typeInfo.type.name) // Extract type names
               .join(" / ")} 
           </Text>
         </View>
