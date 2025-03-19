@@ -1,11 +1,13 @@
+import { useRouter } from 'expo-router';
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, FlatList, StyleSheet } from "react-native";
+import { View, Text, Image, FlatList, StyleSheet, Pressable } from "react-native";
 
 
 export default function PokemonList(){
   const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
   const [loading, setLoading] = useState(false);
   const [nextPage, setNextPage] = useState(1);
+  const router = useRouter();
 
 
   type pokeType = {
@@ -89,6 +91,13 @@ export default function PokemonList(){
       return findBackgroundColor(types[1].type.name)
     }
   }
+
+  function touch(id : string){
+    router.push({
+      pathname: '/about',
+      params: { query: `${id}`},
+    });
+  }
   
 
   type p = {
@@ -97,7 +106,7 @@ export default function PokemonList(){
 
   // Render each Pokémon item
   const renderPokemon = ({ item } : {item : Pokemon}) => (
-    <View style={styles.dataContainer}>
+    <Pressable style={styles.dataContainer} onPress={()=>touch(item.id)}>
         <View style={[styles.mybackground,{borderLeftColor: findBackgroundColor(item.types[0].type.name), borderBottomColor: findSecondBackground(item.types)}]}></View>
         <Text style={styles.id}>#{String(item.id).padStart(4, '0')}</Text>
         <View style={styles.descriptionContainer}>
@@ -112,7 +121,7 @@ export default function PokemonList(){
               .join(" / ")} 
           </Text>
         </View>
-    </View>
+    </Pressable>
   );
 
 
