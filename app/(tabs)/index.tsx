@@ -1,27 +1,45 @@
+import { useRouter } from 'expo-router';
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, FlatList, StyleSheet } from "react-native";
+import { View, Text, Image, FlatList, StyleSheet, Pressable } from "react-native";
 
 
 export default function PokemonList(){
-  const [pokemonList, setPokemonList] = useState<any>([]);
+  const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
   const [loading, setLoading] = useState(false);
   const [nextPage, setNextPage] = useState(1);
+  const router = useRouter();
+
+
+  type pokeType = {
+    type : {
+      name : string
+    }
+  }
+
+  interface Pokemon {
+    name : string;
+    id : string
+    sprites: {
+      front_default: string;
+    };
+    types : pokeType[]
+  }
 
 
   // Appends the json of each pokemon, in the range startId-endId, to pokemonList
   async function fetchPokemon(startId : number, endId : number){
     setLoading(true);
-    const newPokemon : any[] = [];
+    const newPokemon : Pokemon[] = [];
     for (let id = startId; id <= endId; id++) {
       try {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-        const data = await response.json();
+        const data : Pokemon = await response.json();
         newPokemon.push(data);
       } catch (error) {
         console.error("Error fetching Pokémon:", error);
       }
     }
-    setPokemonList((prev : any[]) => [...prev, ...newPokemon]);
+    setPokemonList((prev : Pokemon[]) => [...prev, ...newPokemon]);
     setLoading(false);
   };
 
@@ -42,8 +60,8 @@ export default function PokemonList(){
   };
 
 
-  function findBackgroundColor(type : string){
-    const typeColors : any = {
+  function findBackgroundColor(type : string) : string{
+    const typeColors : {[type : string] : string} = {
       normal: '#A8A878',
       fighting: '#C03028',
       flying: '#A890F0',
@@ -66,19 +84,30 @@ export default function PokemonList(){
     return typeColors[type]
   }
 
-  function findSecondBackground(types : Array<any>){
+  function findSecondBackground(types : Array<pokeType>){
     if (types.length == 1){
       return findBackgroundColor(types[0].type.name)}
     else {
       return findBackgroundColor(types[1].type.name)
     }
   }
+
+  function touch(id : string){
+    router.push({
+      pathname: '/about',
+      params: { query: `${id}`},
+    });
+  }
   
 
+  type p = {
+    item : Pokemon
+  }
+
   // Render each Pokémon item
-  const renderPokemon = ({ item } : any) => (
-    <View style={[styles.dataContainer, {backgroundColor: findBackgroundColor(item.types[0].type.name)}]}>
-        <View style={[styles.otherHalf,{borderBottomColor: findSecondBackground(item.types)}]}></View>
+  const renderPokemon = ({ item } : {item : Pokemon}) => (
+    <Pressable style={styles.dataContainer} onPress={()=>touch(item.id)}>
+        <View style={[styles.mybackground,{borderLeftColor: findBackgroundColor(item.types[0].type.name), borderBottomColor: findSecondBackground(item.types)}]}></View>
         <Text style={styles.id}>#{String(item.id).padStart(4, '0')}</Text>
         <View style={styles.descriptionContainer}>
           <Image
@@ -88,11 +117,11 @@ export default function PokemonList(){
           <Text style={styles.name}>{item.name}</Text>
           <Text style={styles.type}>
             {item.types
-              .map((typeInfo : any) => typeInfo.type.name) // Extract type names
+              .map((typeInfo) => typeInfo.type.name) // Extract type names
               .join(" / ")} 
           </Text>
         </View>
-    </View>
+    </Pressable>
   );
 
 
@@ -127,12 +156,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  otherHalf:{
+  mybackground:{
     position: 'absolute',
-    borderRadius: 40,
+    borderRadius: 0,
     borderLeftWidth: 250,
     borderBottomWidth: 250,
-    borderLeftColor: 'transparent',
     bottom: 0,
   },
   dataContainer: {
@@ -141,7 +169,7 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 5,
     alignItems: "center",
-    borderRadius: 40,
+    borderRadius: 0,
   },
   image: {
     width: 150,
