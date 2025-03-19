@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocalSearchParams } from "expo-router";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { useState, useEffect } from "react";
 
@@ -14,7 +15,8 @@ export default function About() {
     };
   }
 
-  let id = "1"; //id = whatever we're given by another page. Change to switch pokemon
+  // let id = "1"; id = whatever we're given by another page. Change to switch pokemon
+  const { id } = useLocalSearchParams();
 
   const [poke, setPoke] = useState<Pokemon | null>(null);
 
@@ -25,7 +27,7 @@ export default function About() {
         setPoke(pokeData);
       })
       .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+  }, [id]);
 
   //formats the type data from an object to useable strings
   function typeFormat(types: any[]): string[] {
@@ -35,7 +37,6 @@ export default function About() {
 
   return (
     <View style={styles.aboutContainer}>
-      <Text style={styles.text}>About screen placeholder</Text>
       {/* Check to see if Poke data is null before rendering*/}
       {poke ? (
         <View>
@@ -57,7 +58,7 @@ export default function About() {
           </Text>
         </View>
       ) : (
-        <Text style={styles.text}>Pokemon data not available</Text>
+        <Text style={styles.text}>Loading. . .</Text>
       )}
     </View>
   );
@@ -74,3 +75,27 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 });
+
+function findBackgroundColor(type : string){
+  const typeColors : any = {
+    normal: '#A8A878',
+    fighting: '#C03028',
+    flying: '#A890F0',
+    poison: '#A040A0',
+    ground: '#E0C068',
+    rock: '#B8A038',
+    bug: '#A8B820',
+    ghost: '#705898',
+    steel: '#B8B8D0',
+    fire: '#F08030',
+    water: '#6890F0',
+    grass: '#78C850',
+    electric: '#F8D030',
+    psychic: '#F85888',
+    ice: '#98D8D8',
+    dragon: '#7038F8',
+    dark: '#705848',
+    fairy: '#EE99AC'
+                    }
+  return typeColors[type]
+}
