@@ -16,7 +16,8 @@ export default function About() {
   }
 
   // let id = "1"; id = whatever we're given by another page. Change to switch pokemon
-  const { id } = useLocalSearchParams();
+  const { blank, query } = useLocalSearchParams();
+  const id = query
 
   const [poke, setPoke] = useState<Pokemon | null>(null);
 
