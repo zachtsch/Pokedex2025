@@ -1,7 +1,8 @@
-import React from "react";
+import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-native";
 import { useState, useEffect } from "react";
+import { findBackgroundColor } from "./(tabs)";
 
 export default function About() {
   interface Pokemon {
@@ -17,7 +18,7 @@ export default function About() {
 
   // let id = "1"; id = whatever we're given by another page. Change to switch pokemon
   const { blank, query } = useLocalSearchParams();
-  const id = query
+  const id = query;
 
   const [poke, setPoke] = useState<Pokemon | null>(null);
 
@@ -36,27 +37,66 @@ export default function About() {
     return types;
   }
 
+  //route to evolution page
+  const router = useRouter();
+  function touch(id: string) {
+    router.push({
+      pathname: "/evolution",
+      params: { query: `${id}` },
+    });
+  }
+
   return (
-    <View style={styles.aboutContainer}>
-      {/* Check to see if Poke data is null before rendering*/}
+    <View style={styles.aboutScreen}>
       {poke ? (
-        <View>
+        <View style={styles.aboutContainer}>
+          <View>
+            <Text style={styles.name}>
+              {poke.name
+                .split("-")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}
+            </Text>
+            <Text style={styles.text}>{typeFormat(poke.types).join(" / ")}</Text>
+          </View>
           <Image
             source={{ uri: poke.sprites.front_default }}
             style={{ width: 300, height: 300 }}
           />
-          <Text style={styles.text}>
-            {typeFormat(poke.types).join(" / ")}
+          <Text>
+            <Text style={styles.infotext}>About:</Text>
             {"\n"}
-            {poke.name
-              .split("-")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")}
-            {"\n"}
-            {poke.height / 10 + " m"}
-            {"\n"}
-            {poke.weight / 10 + " kg"}
+            <ScrollView style={{height: 110}}>
+              <Text style={{fontSize: 16}}>Pokemon Info goes here! 
+                Sometimes pokedex entries can be quite long.
+                The longest flavor text entry on record is from the alolan pokedex,
+                which is notorious in the series for having very long entries.
+              </Text>
+            </ScrollView>
           </Text>
+          <View style={styles.info}>
+            <Text style={[styles.text, { textAlign: "center" }]}>
+              <Text style={styles.infotext}>Height:</Text>
+              {"\n"}
+              {poke.height / 10 + " m"}
+            </Text>
+            <Text style={[styles.text, { textAlign: "center" }]}>
+              <Text style={styles.infotext}>Weight:</Text>
+              {"\n"}
+              {poke.weight / 10 + " kg"}
+            </Text>
+          </View>
+          <Pressable
+            style={[
+              styles.evobutton,
+              {
+                backgroundColor: findBackgroundColor(typeFormat(poke.types)[0]),
+              },
+            ]}
+            onPress={() => touch(id[0])}
+          >
+            <Text style={styles.buttontext}>Evolution</Text>
+          </Pressable>
         </View>
       ) : (
         <Text style={styles.text}>Loading. . .</Text>
@@ -66,37 +106,44 @@ export default function About() {
 }
 
 const styles = StyleSheet.create({
-  aboutContainer: {
+  aboutScreen: {
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "white",
+  },
+  aboutContainer: {
+    width: 300,
+    gap: 40,
+    justifyContent: "center",
+  },
+  info: {
+    paddingLeft: "10%",
+    paddingRight: "10%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  infotext: {
+    fontSize: 20,
+    fontWeight: "bold",
+    fontStyle: "italic",
   },
   text: {
-    color: "blue",
+    color: "black",
     fontSize: 20,
   },
+  buttontext: {
+    fontSize: 18,
+  },
+  name: {
+    fontWeight: "bold",
+    fontSize: 28,
+  },
+  evobutton: {
+    height: 50,
+    width: "auto",
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
-
-function findBackgroundColor(type : string){
-  const typeColors : any = {
-    normal: '#A8A878',
-    fighting: '#C03028',
-    flying: '#A890F0',
-    poison: '#A040A0',
-    ground: '#E0C068',
-    rock: '#B8A038',
-    bug: '#A8B820',
-    ghost: '#705898',
-    steel: '#B8B8D0',
-    fire: '#F08030',
-    water: '#6890F0',
-    grass: '#78C850',
-    electric: '#F8D030',
-    psychic: '#F85888',
-    ice: '#98D8D8',
-    dragon: '#7038F8',
-    dark: '#705848',
-    fairy: '#EE99AC'
-                    }
-  return typeColors[type]
-}
