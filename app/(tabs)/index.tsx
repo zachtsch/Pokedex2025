@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, FlatList, StyleSheet, Pressable } from "react-native";
+import { Platform, View, Text, Image, FlatList, StyleSheet, Pressable } from "react-native";
 
 
 export default function PokemonList(){
@@ -124,6 +124,8 @@ export default function PokemonList(){
     </Pressable>
   );
 
+    // Fit to mobile devices 
+    const numColumns = Platform.OS === 'web' ? 3 : 1;
 
   return (
     <View style={styles.pokeContainer}>
