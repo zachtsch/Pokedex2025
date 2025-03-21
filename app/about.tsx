@@ -5,6 +5,11 @@ import { useState, useEffect } from "react";
 import { findBackgroundColor } from "./(tabs)";
 import { useFonts } from "expo-font";
 
+export function typeFormat(types: any[]): string[] {
+  types = types.map((item) => item.type.name);
+  return types;
+}
+
 export default function About() {
   interface Pokemon {
     name: string;
@@ -73,7 +78,7 @@ export default function About() {
             </View>
             <View style={{flexDirection: 'row', gap: 5}}>
               {poke.types.map((plate) => {
-                return (<Image source={plateMap[plate]} />);
+                return (<Image key={plate} source={plateMap[plate]} />);
               })}
             </View>
           </View>
