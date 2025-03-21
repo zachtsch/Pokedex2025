@@ -6,11 +6,11 @@ import { findBackgroundColor } from "./(tabs)";
 
 export default function About() {
   interface Pokemon {
-    // Define the structure of the Pokemon object to avoid errors when accessing Poke data
     name: string;
     height: number;
     weight: number;
     types: string[];
+    info: string;
     sprites: {
       front_default: string;
     };
@@ -26,16 +26,21 @@ export default function About() {
     fetch("https://pokeapi.co/api/v2/pokemon/" + id)
       .then((response) => response.json())
       .then((pokeData) => {
-        setPoke(pokeData);
+        return fetch("https://pokeapi.co/api/v2/pokemon-species/" + id)
+        .then((response) => response.json())
+        .then((speciesData) => {
+          setPoke({...pokeData, 
+            types: pokeData.types.map((item: { type: { name: string; }; }) => item.type.name),
+            info: speciesData.flavor_text_entries.find((entry: any) => 
+              entry.language.name == "en")
+            .flavor_text.replace(/[\n\f]/g, ' ').replace('POKéMON', 'Pokémon'), 
+            //flavor text has really ugly default formatting, tried to clean it up a little
+          })
+        })
+        .catch((error) => console.error("Error fetching data:", error));
       })
       .catch((error) => console.error("Error fetching data:", error));
   }, [id]);
-
-  //formats the type data from an object to useable strings
-  function typeFormat(types: any[]): string[] {
-    types = types.map((item) => item.type.name);
-    return types;
-  }
 
   //route to evolution page
   const router = useRouter();
@@ -51,14 +56,17 @@ export default function About() {
       {poke ? (
         <View style={styles.aboutContainer}>
           <View>
-            <Text style={styles.name}>
-              {poke.name
-                .split("-")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ")}
-            </Text>
+            <View style={styles.namebar}>
+              <Text style={styles.name}>
+                {poke.name
+                  .split("-")
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(" ")}
+              </Text>
+              <Text style={[styles.infotext, {fontSize: 16}]}>{'#'+ id}</Text>
+            </View>
             <View style={{flexDirection: 'row', gap: 5}}>
-              {typeFormat(poke.types).map((plate) => {
+              {poke.types.map((plate) => {
                 return (<Image source={plateMap[plate]} />);
               })}
             </View>
@@ -70,11 +78,8 @@ export default function About() {
           <Text>
             <Text style={styles.infotext}>About:</Text>
             {"\n"}
-            <ScrollView style={{height: 110}}>
-              <Text style={{fontSize: 16}}>Pokemon Info goes here! 
-                Sometimes pokedex entries can be quite long.
-                The longest flavor text entry on record is from the alolan pokedex,
-                which is notorious in the series for having very long entries.
+            <ScrollView>
+              <Text style={{fontSize: 18}}>{poke.info}
               </Text>
             </ScrollView>
           </Text>
@@ -82,25 +87,20 @@ export default function About() {
             <Text style={[styles.text, { textAlign: "center" }]}>
               <Text style={styles.infotext}>Height:</Text>
               {"\n"}
-              {poke.height / 10 + " m"}
+              <Text style={{fontSize: 18}}>{poke.height / 10 + " m"}</Text>
             </Text>
             <Text style={[styles.text, { textAlign: "center" }]}>
               <Text style={styles.infotext}>Weight:</Text>
               {"\n"}
-              {poke.weight / 10 + " kg"}
+              <Text style={{fontSize: 18}}>{poke.weight / 10 + " kg"}</Text>
             </Text>
           </View>
           <Pressable
-            style={[
-              styles.evobutton,
-              {
-                backgroundColor: findBackgroundColor(typeFormat(poke.types)[0]),
-              },
-            ]}
-            onPress={() => touch(id+'')}
-          >
+            style={[styles.evobutton,
+              {backgroundColor: findBackgroundColor(poke.types[0])}]} 
+                onPress={() => touch(id+'')}>
             <Text style={styles.buttontext}>Evolution</Text>
-          </Pressable>
+          </Pressable>         
         </View>
       ) : (
         <Text style={styles.text}>Loading. . .</Text>
@@ -160,11 +160,16 @@ const styles = StyleSheet.create({
   },
   buttontext: {
     fontSize: 18,
-    userSelect: "none"
+    userSelect: "none",
   },
   name: {
     fontWeight: "bold",
     fontSize: 28,
+  },
+  namebar:{
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   evobutton: {
     height: 50,
