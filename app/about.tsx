@@ -4,6 +4,14 @@ import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-nati
 import { useState, useEffect } from "react";
 import { findBackgroundColor } from "./(tabs)";
 
+
+//formats the type data from an object to useable strings
+export function typeFormat(types: any[]): string[] {
+  types = types.map((item) => item.type.name);
+  return types;
+}
+
+
 export default function About() {
   interface Pokemon {
     // Define the structure of the Pokemon object to avoid errors when accessing Poke data
@@ -32,10 +40,10 @@ export default function About() {
   }, [id]);
 
   //formats the type data from an object to useable strings
-  function typeFormat(types: any[]): string[] {
-    types = types.map((item) => item.type.name);
-    return types;
-  }
+  // function typeFormat(types: any[]): string[] {
+  //   types = types.map((item) => item.type.name);
+  //   return types;
+  // }
 
   //route to evolution page
   const router = useRouter();
