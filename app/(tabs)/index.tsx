@@ -134,7 +134,7 @@ export default function PokemonList(){
     // grab font
     useEffect(() => {
       Font.loadAsync({
-        'pokeFont': require('../../assets/fonts/pokeFont.ttf'),
+        'pokeFontMain': require('../../assets/fonts/pokeFontMain.ttf'),
       });
     }, []);
 
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   title: {
        fontSize: 50,
        fontWeight: 'bold',
-       fontFamily: 'pokeFont'
+       fontFamily: 'pokeFontMain'
   },
   pokeContainer: {
     flex: 1,
@@ -196,13 +196,13 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     width: 210,
     paddingTop: 10,
-    fontFamily: 'pokeFont'
+    fontFamily: 'pokeFontMain'
   },
   name:{
     textTransform: 'uppercase',
     fontSize: 28,
     fontWeight: "bold",
-    fontFamily: 'pokeFont'
+    fontFamily: 'pokeFontMain'
   },
   type:{
     fontSize: 28,
