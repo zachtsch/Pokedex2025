@@ -4,6 +4,11 @@ import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-nati
 import { useState, useEffect } from "react";
 import { findBackgroundColor } from "./(tabs)";
 
+export function typeFormat(types: any[]): string[] {
+  types = types.map((item) => item.type.name);
+  return types;
+}
+
 export default function About() {
   interface Pokemon {
     name: string;
@@ -66,7 +71,7 @@ export default function About() {
               <Text style={[styles.infotext, {fontSize: 16}]}>{'#'+ id}</Text>
             </View>
             <View style={{flexDirection: 'row', gap: 5}}>
-              {poke.types.map((plate, index) => {
+              {poke.types.map((plate) => {
                 return (<Image key={plate} source={plateMap[plate]} />);
               })}
             </View>
