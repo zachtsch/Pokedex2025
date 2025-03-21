@@ -66,8 +66,8 @@ export default function About() {
               <Text style={[styles.infotext, {fontSize: 16}]}>{'#'+ id}</Text>
             </View>
             <View style={{flexDirection: 'row', gap: 5}}>
-              {poke.types.map((plate) => {
-                return (<Image source={plateMap[plate]} />);
+              {poke.types.map((plate, index) => {
+                return (<Image key={plate} source={plateMap[plate]} />);
               })}
             </View>
           </View>
