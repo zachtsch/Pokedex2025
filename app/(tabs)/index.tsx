@@ -1,6 +1,8 @@
 import { useRouter } from 'expo-router';
 import React, { useState, useEffect } from "react";
 import { Platform, View, Text, Image, FlatList, StyleSheet, Pressable } from "react-native";
+import { plateMap, typeFormat } from '../about';
+import * as Font from 'expo-font';
 
 export function findBackgroundColor(type: string): string {
   const typeColors: { [type: string]: string } = {
@@ -114,9 +116,13 @@ export default function PokemonList(){
           />
           <Text style={styles.name}>{item.name}</Text>
           <Text style={styles.type}>
-            {item.types
+            {typeFormat(item.types).map((plate) => {
+                return (<Image source={plateMap[plate]}/>)
+              })}
+
+            {/* {item.types
               .map((typeInfo) => typeInfo.type.name) // Extract type names
-              .join(" / ")} 
+              .join(" / ")}  */}
           </Text>
         </View>
     </Pressable>
@@ -125,9 +131,16 @@ export default function PokemonList(){
     // Fit to mobile devices 
     const numColumns = Platform.OS === 'web' ? 3 : 1;
 
+    // grab font
+    useEffect(() => {
+      Font.loadAsync({
+        'pokeFont': require('../../assets/fonts/pokeFont.ttf'),
+      });
+    }, []);
+
   return (
     <View style={styles.pokeContainer}>
-      <Text style={styles.title}>Pokédex</Text>
+      <Text style={styles.title}>Pokédex ◓</Text>
       <FlatList
         numColumns={3}
         data={pokemonList}
@@ -143,8 +156,9 @@ export default function PokemonList(){
 
 const styles = StyleSheet.create({
   title: {
-       fontSize: 40,
-       fontWeight: 'bold'
+       fontSize: 50,
+       fontWeight: 'bold',
+       fontFamily: 'pokeFont'
   },
   pokeContainer: {
     flex: 1,
@@ -178,17 +192,21 @@ const styles = StyleSheet.create({
     margin: 0
   },
   id:{
-    fontSize: 18,
+    fontSize: 24,
     textAlign: 'left',
     width: 210,
     paddingTop: 10,
+    fontFamily: 'pokeFont'
   },
   name:{
     textTransform: 'uppercase',
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: "bold",
+    fontFamily: 'pokeFont'
   },
   type:{
-    fontSize: 18,
+    fontSize: 28,
+    flexDirection: 'row',
+    gap: 5
   }
 });
