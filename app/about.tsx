@@ -1,8 +1,9 @@
 import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
-import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, ScrollView, ImageBackground } from "react-native";
 import { useState, useEffect } from "react";
 import { findBackgroundColor } from "./(tabs)";
+import { useFonts } from "expo-font";
 
 
 //formats the type data from an object to useable strings
@@ -29,6 +30,10 @@ export default function About() {
   const id = query;
 
   const [poke, setPoke] = useState<Pokemon | null>(null);
+
+  const [fontsLoaded] = useFonts({
+    'pokefont': require('../assets/fonts/Pokemon.ttf'),
+  });
 
   useEffect(() => {
     fetch("https://pokeapi.co/api/v2/pokemon/" + id)
@@ -59,10 +64,11 @@ export default function About() {
     });
   }
 
+
   return (
-    <View style={styles.aboutScreen}>
+    <ImageBackground source = {require('../assets/images/pokemonbackground-blur.png')} style ={styles.aboutScreen}>
       {poke ? (
-        <View style={styles.aboutContainer}>
+        <View style={[styles.aboutContainer,{borderColor: findBackgroundColor(poke.types[0])}]}>
           <View>
             <View style={styles.namebar}>
               <Text style={styles.name}>
@@ -79,15 +85,17 @@ export default function About() {
               })}
             </View>
           </View>
+          <ImageBackground source = {require('../assets/images/pokemonbackground-blur.png')} style={{alignItems: 'center', height: 300, width: 330, justifyContent: 'center'}}>
           <Image
             source={{ uri: poke.sprites.front_default }}
-            style={{ width: 300, height: 300 }}
+            style={{ width: 300, height: 300, resizeMode: "contain" }}
           />
+          </ImageBackground>
           <Text>
             <Text style={styles.infotext}>About:</Text>
             {"\n"}
             <ScrollView>
-              <Text style={{fontSize: 18}}>{poke.info}
+              <Text style={{fontSize: 13, fontFamily: 'pokefont'}}>{poke.info}
               </Text>
             </ScrollView>
           </Text>
@@ -107,13 +115,13 @@ export default function About() {
             style={[styles.evobutton,
               {backgroundColor: findBackgroundColor(poke.types[0])}]} 
                 onPress={() => touch(id+'')}>
-            <Text style={styles.buttontext}>Evolution</Text>
+            <Text style={styles.buttontext}>EVOLUTION</Text>
           </Pressable>         
         </View>
       ) : (
         <Text style={styles.text}>Loading. . .</Text>
       )}
-    </View>
+    </ImageBackground>
   );
 }
 
@@ -144,12 +152,14 @@ const styles = StyleSheet.create({
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "white",
   },
   aboutContainer: {
-    width: 300,
+    width: 400,
     height: "90%",
-    justifyContent: "space-evenly"
+    justifyContent: "space-evenly",
+    backgroundColor:"white",
+    paddingHorizontal: 20,
+    borderWidth: 15,
   },
   info: {
     paddingLeft: "10%",
@@ -161,18 +171,23 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     fontStyle: "italic",
+    fontFamily: 'pokefont',
   },
   text: {
     color: "black",
     fontSize: 20,
+    fontFamily: 'pokefont',
   },
   buttontext: {
     fontSize: 18,
     userSelect: "none",
+    fontFamily: 'pokefont',
+    fontWeight: "bold",
   },
   name: {
     fontWeight: "bold",
     fontSize: 28,
+    fontFamily: 'pokefont',
   },
   namebar:{
     flexDirection: "row",
