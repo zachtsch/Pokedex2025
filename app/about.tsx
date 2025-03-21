@@ -16,7 +16,7 @@ export default function About() {
     };
   }
 
-  // let id = "1"; id = whatever we're given by another page. Change to switch pokemon
+  //id grab from index
   const { blank, query } = useLocalSearchParams();
   const id = query;
 
@@ -57,7 +57,11 @@ export default function About() {
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                 .join(" ")}
             </Text>
-            <Text style={styles.text}>{typeFormat(poke.types).join(" / ")}</Text>
+            <View style={{flexDirection: 'row', gap: 5}}>
+              {typeFormat(poke.types).map((plate) => {
+                return (<Image source={plateMap[plate]} />);
+              })}
+            </View>
           </View>
           <Image
             source={{ uri: poke.sprites.front_default }}
@@ -93,7 +97,7 @@ export default function About() {
                 backgroundColor: findBackgroundColor(typeFormat(poke.types)[0]),
               },
             ]}
-            onPress={() => touch(id[0])}
+            onPress={() => touch(id+'')}
           >
             <Text style={styles.buttontext}>Evolution</Text>
           </Pressable>
@@ -105,6 +109,28 @@ export default function About() {
   );
 }
 
+//image mapping for type plate assets
+export const plateMap : Record<string, any> = {
+  bug: require('../assets/images/types/bug.png'),
+  dark: require('../assets/images/types/dark.png'),
+  dragon: require('../assets/images/types/dragon.png'),
+  electric: require('../assets/images/types/electric.png'),
+  fairy: require('../assets/images/types/fairy.png'),
+  fighting: require('../assets/images/types/fighting.png'),
+  fire: require('../assets/images/types/fire.png'),
+  flying: require('../assets/images/types/flying.png'),
+  ghost: require('../assets/images/types/ghost.png'),
+  grass: require('../assets/images/types/grass.png'),
+  ground: require('../assets/images/types/ground.png'),
+  ice: require('../assets/images/types/ice.png'),
+  normal: require('../assets/images/types/normal.png'),
+  poison: require('../assets/images/types/poison.png'),
+  psychic: require('../assets/images/types/psychic.png'),
+  rock: require('../assets/images/types/rock.png'),
+  steel: require('../assets/images/types/steel.png'),
+  water: require('../assets/images/types/water.png'),
+};
+
 const styles = StyleSheet.create({
   aboutScreen: {
     height: "100%",
@@ -114,8 +140,8 @@ const styles = StyleSheet.create({
   },
   aboutContainer: {
     width: 300,
-    gap: 40,
-    justifyContent: "center",
+    height: "90%",
+    justifyContent: "space-evenly"
   },
   info: {
     paddingLeft: "10%",
@@ -134,6 +160,7 @@ const styles = StyleSheet.create({
   },
   buttontext: {
     fontSize: 18,
+    userSelect: "none"
   },
   name: {
     fontWeight: "bold",
