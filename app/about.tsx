@@ -1,5 +1,5 @@
-import { useRouter } from "expo-router";
-import { useLocalSearchParams } from "expo-router";
+import { useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import {
   View,
   Text,
@@ -8,10 +8,10 @@ import {
   Pressable,
   ScrollView,
   ImageBackground,
-} from "react-native";
-import { useState, useEffect } from "react";
-import { findBackgroundColor } from "./(tabs)";
-import { useFonts } from "expo-font";
+} from 'react-native';
+import { useState, useEffect } from 'react';
+import { findBackgroundColor } from './(tabs)';
+import { useFonts } from 'expo-font';
 
 //formats the type data from an object to useable strings
 export function typeFormat(types: any[]): string[] {
@@ -38,14 +38,14 @@ export default function About() {
   const [poke, setPoke] = useState<Pokemon | null>(null);
 
   const [fontsLoaded] = useFonts({
-    pokefont: require("../assets/fonts/Pokemon.ttf"),
+    pokefont: require('../assets/fonts/Pokemon.ttf'),
   });
 
   useEffect(() => {
-    fetch("https://pokeapi.co/api/v2/pokemon/" + id)
+    fetch('https://pokeapi.co/api/v2/pokemon/' + id)
       .then((response) => response.json())
       .then((pokeData) => {
-        return fetch("https://pokeapi.co/api/v2/pokemon-species/" + id)
+        return fetch('https://pokeapi.co/api/v2/pokemon-species/' + id)
           .then((response) => response.json())
           .then((speciesData) => {
             setPoke({
@@ -54,29 +54,29 @@ export default function About() {
                 (item: { type: { name: string } }) => item.type.name
               ),
               info: speciesData.flavor_text_entries
-                .find((entry: any) => entry.language.name == "en")
-                .flavor_text.replace(/[\n\f]/g, " ")
-                .replace("POKéMON", "Pokémon"),
+                .find((entry: any) => entry.language.name == 'en')
+                .flavor_text.replace(/[\n\f]/g, ' ')
+                .replace('POKéMON', 'Pokémon'),
               //flavor text has really ugly default formatting, tried to clean it up a little
             });
           })
-          .catch((error) => console.error("Error fetching data:", error));
+          .catch((error) => console.error('Error fetching data:', error));
       })
-      .catch((error) => console.error("Error fetching data:", error));
+      .catch((error) => console.error('Error fetching data:', error));
   }, [id]);
 
   //route to evolution page
   const router = useRouter();
   function touch(id: string) {
     router.push({
-      pathname: "/evolution",
+      pathname: '/evolution',
       params: { query: `${id}` },
     });
   }
 
   return (
     <ImageBackground
-      source={require("../assets/images/pokemonbackground-blur.png")}
+      source={require('../assets/images/pokemonbackground-blur.png')}
       style={styles.aboutScreen}
     >
       {poke ? (
@@ -90,56 +90,56 @@ export default function About() {
             <View style={styles.namebar}>
               <Text style={styles.name}>
                 {poke.name
-                  .split("-")
+                  .split('-')
                   .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")}
+                  .join(' ')}
               </Text>
               <Text style={[styles.infotext, { fontSize: 16 }]}>
-                {"#" + id}
+                {'#' + id}
               </Text>
             </View>
-            <View style={{ flexDirection: "row", gap: 5 }}>
+            <View style={{ flexDirection: 'row', gap: 5 }}>
               {poke.types.map((plate) => {
                 return (
                   <Image
                     key={plate}
                     source={plateMap[plate]}
                     style={{ width: 75, height: 30 }}
-                    resizeMode="contain"
+                    resizeMode='contain'
                   />
                 );
               })}
             </View>
           </View>
           <ImageBackground
-            source={require("../assets/images/pokemonbackground-blur.png")}
+            source={require('../assets/images/pokemonbackground-blur.png')}
             style={styles.imgBackground}
           >
             <Image
               source={{ uri: poke.sprites.front_default }}
-              style={{ width: 300, height: 300}}
-              resizeMode="contain"
+              style={{ width: 300, height: 300 }}
+              resizeMode='contain'
             />
           </ImageBackground>
           <Text>
             <Text style={styles.infotext}>About:</Text>
-            {"\n"}
-            <ScrollView style={{maxHeight:110}}>
-              <Text style={{ fontSize: 13, fontFamily: "pokefont" }}>
+            {'\n'}
+            <ScrollView style={{ maxHeight: 110 }}>
+              <Text style={{ fontSize: 13, fontFamily: 'pokefont' }}>
                 {poke.info}
               </Text>
             </ScrollView>
           </Text>
           <View style={styles.info}>
-            <Text style={[styles.text, { textAlign: "center" }]}>
+            <Text style={[styles.text, { textAlign: 'center' }]}>
               <Text style={styles.infotext}>Height:</Text>
-              {"\n"}
-              <Text style={{ fontSize: 18 }}>{poke.height / 10 + " m"}</Text>
+              {'\n'}
+              <Text style={{ fontSize: 18 }}>{poke.height / 10 + ' m'}</Text>
             </Text>
-            <Text style={[styles.text, { textAlign: "center" }]}>
+            <Text style={[styles.text, { textAlign: 'center' }]}>
               <Text style={styles.infotext}>Weight:</Text>
-              {"\n"}
-              <Text style={{ fontSize: 18 }}>{poke.weight / 10 + " kg"}</Text>
+              {'\n'}
+              <Text style={{ fontSize: 18 }}>{poke.weight / 10 + ' kg'}</Text>
             </Text>
           </View>
           <Pressable
@@ -147,7 +147,7 @@ export default function About() {
               styles.evobutton,
               { backgroundColor: findBackgroundColor(poke.types[0]) },
             ]}
-            onPress={() => touch(id + "")}
+            onPress={() => touch(id + '')}
           >
             <Text style={styles.buttontext}>EVOLUTION</Text>
           </Pressable>
@@ -161,87 +161,87 @@ export default function About() {
 
 //image mapping for type plate assets
 export const plateMap: Record<string, any> = {
-  bug: require("../assets/images/types/bug.png"),
-  dark: require("../assets/images/types/dark.png"),
-  dragon: require("../assets/images/types/dragon.png"),
-  electric: require("../assets/images/types/electric.png"),
-  fairy: require("../assets/images/types/fairy.png"),
-  fighting: require("../assets/images/types/fighting.png"),
-  fire: require("../assets/images/types/fire.png"),
-  flying: require("../assets/images/types/flying.png"),
-  ghost: require("../assets/images/types/ghost.png"),
-  grass: require("../assets/images/types/grass.png"),
-  ground: require("../assets/images/types/ground.png"),
-  ice: require("../assets/images/types/ice.png"),
-  normal: require("../assets/images/types/normal.png"),
-  poison: require("../assets/images/types/poison.png"),
-  psychic: require("../assets/images/types/psychic.png"),
-  rock: require("../assets/images/types/rock.png"),
-  steel: require("../assets/images/types/steel.png"),
-  water: require("../assets/images/types/water.png"),
+  bug: require('../assets/images/types/bug.png'),
+  dark: require('../assets/images/types/dark.png'),
+  dragon: require('../assets/images/types/dragon.png'),
+  electric: require('../assets/images/types/electric.png'),
+  fairy: require('../assets/images/types/fairy.png'),
+  fighting: require('../assets/images/types/fighting.png'),
+  fire: require('../assets/images/types/fire.png'),
+  flying: require('../assets/images/types/flying.png'),
+  ghost: require('../assets/images/types/ghost.png'),
+  grass: require('../assets/images/types/grass.png'),
+  ground: require('../assets/images/types/ground.png'),
+  ice: require('../assets/images/types/ice.png'),
+  normal: require('../assets/images/types/normal.png'),
+  poison: require('../assets/images/types/poison.png'),
+  psychic: require('../assets/images/types/psychic.png'),
+  rock: require('../assets/images/types/rock.png'),
+  steel: require('../assets/images/types/steel.png'),
+  water: require('../assets/images/types/water.png'),
 };
 
 const styles = StyleSheet.create({
   aboutScreen: {
-    height: "100%",
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
+    height: '100%',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   aboutContainer: {
     width: 400,
-    height: "90%",
-    justifyContent: "space-evenly",
-    backgroundColor: "white",
+    height: '90%',
+    justifyContent: 'space-evenly',
+    backgroundColor: 'white',
     paddingHorizontal: 20,
     borderWidth: 15,
     borderRadius: 3,
   },
   info: {
-    paddingLeft: "10%",
-    paddingRight: "10%",
-    flexDirection: "row",
-    justifyContent: "space-between",
+    paddingLeft: '10%',
+    paddingRight: '10%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   infotext: {
     fontSize: 20,
-    fontWeight: "bold",
-    fontStyle: "italic",
-    fontFamily: "pokefont",
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    fontFamily: 'pokefont',
   },
   text: {
-    color: "black",
+    color: 'black',
     fontSize: 20,
-    fontFamily: "pokefont",
+    fontFamily: 'pokefont',
   },
   buttontext: {
     fontSize: 18,
-    userSelect: "none",
-    fontFamily: "pokefont",
-    fontWeight: "bold",
+    userSelect: 'none',
+    fontFamily: 'pokefont',
+    fontWeight: 'bold',
   },
   name: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 28,
-    fontFamily: "pokefont",
-    marginBottom: "1%",
+    fontFamily: 'pokefont',
+    marginBottom: '1%',
   },
   namebar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   evobutton: {
     height: 50,
-    width: "auto",
+    width: 'auto',
     borderRadius: 3,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   imgBackground: {
-    alignItems: "center",
+    alignItems: 'center',
     height: 300,
     width: 330,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
 });
