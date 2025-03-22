@@ -55,7 +55,7 @@ export default function PokemonList(){
   async function fetchPokemon(startId : number, endId : number){
     setLoading(true);
     const newPokemon : Pokemon[] = [];
-    for (let id = startId; id <= endId; id++) {
+    for (let id = startId; id <= endId && id <= 1025; id++) {
       try {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
         const data : Pokemon = await response.json();
@@ -117,7 +117,7 @@ export default function PokemonList(){
           <Text style={styles.name}>{item.name}</Text>
           <Text style={styles.type}>
             {typeFormat(item.types).map((plate) => {
-                return (<Image source={plateMap[plate]}/>)
+                return (<Image key={plate} source={plateMap[plate]}/>)
               })}
 
             {/* {item.types
