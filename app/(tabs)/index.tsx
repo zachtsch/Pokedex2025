@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState, useEffect } from "react";
-import { Platform, View, Text, Image, FlatList, StyleSheet, Pressable } from "react-native";
+import { Dimensions, Platform, View, Text, Image, FlatList, StyleSheet, Pressable } from "react-native";
 import { plateMap, typeFormat } from '../about';
 import * as Font from 'expo-font';
 
@@ -129,7 +129,16 @@ export default function PokemonList(){
   );
 
     // Fit to mobile devices 
-    const numColumns = Platform.OS === 'web' ? 3 : 1;
+    let numColumns = 3;//first assume it's desktop
+    let isWeb = false;
+    if (Platform.OS === 'web') isWeb = true;
+
+    if (isWeb){
+      let windowWidth = Dimensions.get('window').width;
+      if (windowWidth < 750) numColumns = 1;//mobile web
+    } else {
+      numColumns = 1;//ios or android
+    }
 
     // grab font
     useEffect(() => {
@@ -142,7 +151,7 @@ export default function PokemonList(){
     <View style={styles.pokeContainer}>
       <Text style={styles.title}>Pokédex ◓</Text>
       <FlatList
-        numColumns={3}
+        numColumns={numColumns}
         data={pokemonList}
         renderItem={renderPokemon}
         keyExtractor={(item) => item.id.toString()} // Use Pokémon ID as the key
