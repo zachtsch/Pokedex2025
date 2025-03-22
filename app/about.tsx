@@ -104,7 +104,8 @@ export default function About() {
                   <Image
                     key={plate}
                     source={plateMap[plate]}
-                    style={{ width: 75, height: 30, resizeMode: "contain" }}
+                    style={{ width: 75, height: 30 }}
+                    resizeMode="contain"
                   />
                 );
               })}
@@ -116,13 +117,14 @@ export default function About() {
           >
             <Image
               source={{ uri: poke.sprites.front_default }}
-              style={{ width: 300, height: 300, resizeMode: "contain" }}
+              style={{ width: 300, height: 300}}
+              resizeMode="contain"
             />
           </ImageBackground>
           <Text>
             <Text style={styles.infotext}>About:</Text>
             {"\n"}
-            <ScrollView>
+            <ScrollView style={{maxHeight:110}}>
               <Text style={{ fontSize: 13, fontFamily: "pokefont" }}>
                 {poke.info}
               </Text>
@@ -193,6 +195,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 20,
     borderWidth: 15,
+    borderRadius: 3,
   },
   info: {
     paddingLeft: "10%",
@@ -221,6 +224,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 28,
     fontFamily: "pokefont",
+    marginBottom: "1%",
   },
   namebar: {
     flexDirection: "row",
@@ -230,7 +234,7 @@ const styles = StyleSheet.create({
   evobutton: {
     height: 50,
     width: "auto",
-    borderRadius: 15,
+    borderRadius: 3,
     alignItems: "center",
     justifyContent: "center",
   },
