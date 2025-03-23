@@ -70,7 +70,7 @@ export default function About() {
   function touch(id: string) {
     router.push({
       pathname: '/evolution',
-      params: { query: `${id}` },
+      params: { id: `${id}` },
     });
   }
 
