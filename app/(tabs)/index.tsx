@@ -4,6 +4,7 @@ import { Dimensions, Platform, View, Text, Image, FlatList, StyleSheet, Pressabl
 import { plateMap, typeFormat } from '../about';
 import * as Font from 'expo-font';
 
+// Given a type (string) return the color hex number associate with type
 export function findBackgroundColor(type: string): string {
   const typeColors: { [type: string]: string } = {
     normal: "#A8A878",
@@ -84,6 +85,8 @@ export default function PokemonList(){
     }
   };
 
+  // if pokemon has a second type, return the hex number of the color associate with type. 
+  //      otherwise, return the color of the first type.
   function findSecondBackground(types: Array<pokeType>) {
     if (types.length == 1) {
       return findBackgroundColor(types[0].type.name);
@@ -92,6 +95,7 @@ export default function PokemonList(){
     }
   }
 
+  // redirects to about component when pokemon is touched/clicked
   function touch(id : string){
     router.push({
       pathname: '/about',
@@ -99,10 +103,6 @@ export default function PokemonList(){
     });
   }
   
-
-  type p = {
-    item : Pokemon
-  }
 
   // Render each Pokémon item
   const renderPokemon = ({ item } : {item : Pokemon}) => (
@@ -119,25 +119,21 @@ export default function PokemonList(){
             {typeFormat(item.types).map((plate) => {
                 return (<Image key={plate} source={plateMap[plate]}/>)
               })}
-
-            {/* {item.types
-              .map((typeInfo) => typeInfo.type.name) // Extract type names
-              .join(" / ")}  */}
           </Text>
         </View>
     </Pressable>
   );
 
     // Fit to mobile devices 
-    let numColumns = 3;//first assume it's desktop
+    let numColumns = 3; //first assume it's desktop
     let isWeb = false;
     if (Platform.OS === 'web') isWeb = true;
 
     if (isWeb){
       let windowWidth = Dimensions.get('window').width;
-      if (windowWidth < 750) numColumns = 1;//mobile web
+      if (windowWidth < 750) numColumns = 1; //mobile web
     } else {
-      numColumns = 1;//ios or android
+      numColumns = 1; //ios or android
     }
 
     // grab font
