@@ -1,50 +1,36 @@
-# Welcome to your Expo app 👋
+# Welcome to the Capstone 2025 Pokedex Project!
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app). It is a Pokedex App.
+This is a react native Pokedex project created with Expo Go for Capstone: Software Engineering. We used [https://pokeapi.co/] to fetch the Pokemon data. The app consists of the following components:
 
-## Get started
+   1. Main Component
+      * scrollable flatlist that contains 1025 pokemon, clicking on a pokemon redirects the user to the pokemon's about section which contains detailed information of the pokemon.
+      * we grabbed the main components background image from [https://www.reddit.com/r/pokemon/comments/1gdlts/i_made_you_guys_a_background/?rdt=62964] and was created by u/Sandi315. When asked in the comments, the reddit user greenlit others using their work. 
 
-1. Install dependencies
+   2. About Component
+      * contains information about any given pokemon including a brief description and the pokemon's weight, height, type, and id.
+      * also includes an evolution button that redirects the user to the pokemon's evolution chain
 
-   ```bash
-   npm install
-   ```
+   3. Evolution Chain
+      * displays a given pokemon's position in its evolution chain.
 
-2. Start the app
+   4. Search Component
+      * the search tab allows the user to search for a desired pokemon, either by its name or id.
 
-   ```bash
-    npx expo start
-   ```
+   5. Random Pokemon
+      * the random tab allows the user to click a button that generates a random pokemon.
 
-In the output, you'll find options to open the app in a
+## To get started
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   1. Install dependencies
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+      ```bash
+      npm install
+      ```
 
-## Get a fresh project
+   2. Start the app
 
-When you're ready, run:
+      ```bash
+      npx expo start
+      ```
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+   3. To run on the web push 'w', otherwise 'i' for ios and 'a' for andriod. 
