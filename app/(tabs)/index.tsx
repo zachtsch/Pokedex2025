@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState, useEffect } from "react";
-import { Dimensions, Platform, View, Text, Image, FlatList, StyleSheet, Pressable } from "react-native";
+import { Dimensions, Platform, View, Text, Image, FlatList, StyleSheet, Pressable, ImageBackground } from "react-native";
 import { plateMap, typeFormat } from '../about';
 import * as Font from 'expo-font';
 
@@ -148,7 +148,7 @@ export default function PokemonList(){
     }, []);
 
   return (
-    <View style={styles.pokeContainer}>
+    <ImageBackground source={require('../../assets/images/pokeBack.png')} style={styles.pokeContainer}>
       <Text style={styles.title}>Pokédex ◓</Text>
       <FlatList
         numColumns={numColumns}
@@ -159,13 +159,13 @@ export default function PokemonList(){
         onEndReachedThreshold={0.5} // Trigger loadMorePokemon when the user is halfway through the list
         ListFooterComponent={() => loading && <Text>Loading...</Text>} // Show a loading indicator
       />
-    </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   title: {
-       fontSize: 50,
+       fontSize: 80,
        fontWeight: 'bold',
        fontFamily: 'pokeFontMain'
   },
