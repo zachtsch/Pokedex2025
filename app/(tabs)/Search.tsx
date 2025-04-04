@@ -8,12 +8,12 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Keyboard,
+  ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Font from 'expo-font';
-import { plateMap, typeFormat } from '../about'; // Adjust path if needed
+import { plateMap, typeFormat } from '../about';
 
-// Move this to a utils file if you want to reuse it across files
 export function findBackgroundColor(type) {
   const typeColors = {
     normal: '#A8A878',
@@ -40,10 +40,11 @@ export function findBackgroundColor(type) {
 
 function HomeScreen() {
   const [pokemonName, setPokemonName] = useState('');
-  const [pokemonData, setPokemonData] = useState(null);
+  const [matchedPokemonData, setMatchedPokemonData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [pokemonNames, setPokemonNames] = useState([]);
+  const [fontLoaded, setFontLoaded] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -62,12 +63,23 @@ function HomeScreen() {
     fetchAllPokemonNames();
   }, []);
 
-  // Load the Pokémon font
   useEffect(() => {
-    Font.loadAsync({
-      pokeFontMain: require('../../assets/fonts/pokeFontMain.ttf'),
-    });
+    const loadFonts = async () => {
+      await Font.loadAsync({
+        pokeFontMain: require('../../assets/fonts/pokeFontMain.ttf'),
+      });
+      setFontLoaded(true);
+    };
+    loadFonts();
   }, []);
+
+  if (!fontLoaded) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#4a90e2" />
+      </View>
+    );
+  }
 
   const isValidInput = (input) => /^[a-zA-Z0-9]+$/.test(input.trim());
 
@@ -77,46 +89,47 @@ function HomeScreen() {
 
     if (!trimmedName || !isValidInput(trimmedName)) {
       setErrorMessage('Please enter a valid Pokémon name or ID.');
-      setPokemonData(null);
+      setMatchedPokemonData([]);
       return;
     }
 
     setLoading(true);
     setErrorMessage('');
+    setMatchedPokemonData([]);
+
     try {
-      const data = await returnPokeApi(trimmedName);
-      setPokemonData(data);
-    } catch (error) {
-      // Smart fallback: find close match
-      const fallback = pokemonNames.find((name) =>
-        name.startsWith(trimmedName)
-      );
+      if (!isNaN(trimmedName)) {
+        // Search by numeric ID
+        const data = await returnPokeApi(trimmedName);
+        setMatchedPokemonData([data]);
+      } else {
+        // Search by name prefix
+        const filteredNames = pokemonNames.filter((name) =>
+          name.startsWith(trimmedName)
+        );
 
-      if (fallback) {
-        try {
-          const smartData = await returnPokeApi(fallback);
-          setPokemonData(smartData);
-          return;
-        } catch {
-          // fallback failed too
+        if (filteredNames.length === 0) {
+          throw new Error('No matches found');
         }
-      }
 
-      setPokemonData(null);
-      setErrorMessage(
-        'Pokémon not found. Please check your input or try another name or ID.'
-      );
+        const results = await Promise.allSettled(
+          filteredNames.map((name) => returnPokeApi(name))
+        );
+
+        const successful = results
+          .filter((r) => r.status === 'fulfilled')
+          .map((r) => r.value);
+
+        if (successful.length === 0) {
+          throw new Error('All Pokémon fetches failed.');
+        }
+
+        setMatchedPokemonData(successful);
+      }
+    } catch (error) {
+      setErrorMessage(error.message || 'Something went wrong.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handlePressResult = () => {
-    if (pokemonData?.id) {
-      router.push({
-        pathname: '/about',
-        params: { query: `${pokemonData.id}` },
-      });
     }
   };
 
@@ -145,67 +158,83 @@ function HomeScreen() {
 
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
 
-      {pokemonData && !loading && (
-        <TouchableOpacity onPress={handlePressResult}>
-          <View style={styles.dataContainer}>
-            <View
-              style={[
-                styles.mybackground,
-                {
-                  borderLeftColor: findBackgroundColor(
-                    pokemonData.types[0].type.name
-                  ),
-                  borderBottomColor:
-                    pokemonData.types.length > 1
-                      ? findBackgroundColor(pokemonData.types[1].type.name)
-                      : findBackgroundColor(pokemonData.types[0].type.name),
-                },
-              ]}
-            />
-            <Text style={styles.id}>
-              #{String(pokemonData.id).padStart(4, '0')}
-            </Text>
-            <View style={styles.descriptionContainer}>
-              <Image
-                source={{
-                  uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonData.id}.png`,
-                }}
-                style={styles.image}
-              />
-              <Text style={styles.name}>{pokemonData.name}</Text>
-              <View style={styles.type}>
-                {typeFormat(pokemonData.types).map((plate) => (
-                  <Image
-                    key={plate}
-                    source={plateMap[plate]}
-                    style={{ width: 75, height: 30 }}
-                    resizeMode='contain'
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        {matchedPokemonData.length > 0 && !loading &&
+          matchedPokemonData.map((pokemon) => {
+            const primaryType = pokemon.types?.[0]?.type?.name ?? 'normal';
+            const secondaryType =
+              pokemon.types?.[1]?.type?.name ?? primaryType;
+
+            return (
+              <TouchableOpacity
+                key={pokemon.id}
+                onPress={() =>
+                  router.push({
+                    pathname: '/about',
+                    params: { query: `${pokemon.id}` },
+                  })
+                }
+              >
+                <View style={styles.dataContainer}>
+                  <View
+                    style={[
+                      styles.mybackground,
+                      {
+                        borderLeftColor: findBackgroundColor(primaryType),
+                        borderBottomColor: findBackgroundColor(secondaryType),
+                      },
+                    ]}
                   />
-                ))}
-              </View>
-            </View>
-          </View>
-        </TouchableOpacity>
-      )}
+                  <Text style={styles.id}>
+                    #{String(pokemon.id).padStart(4, '0')}
+                  </Text>
+                  <View style={styles.descriptionContainer}>
+                    <Image
+                      source={{
+                        uri: pokemon.sprites?.front_default || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`,
+                      }}
+                      style={styles.image}
+                    />
+                    <Text style={styles.name}>{pokemon.name}</Text>
+                    <View style={styles.type}>
+                      {typeFormat(pokemon.types).map((plate) =>
+                        plateMap[plate] ? (
+                          <Image
+                            key={plate}
+                            source={plateMap[plate]}
+                            style={{ width: 75, height: 30 }}
+                            resizeMode='contain'
+                          />
+                        ) : null
+                      )}
+                    </View>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+      </ScrollView>
     </View>
   );
 }
 
 async function returnPokeApi(name) {
-  const url = `https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`;
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Pokémon not found`);
+  try {
+    const url = `https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Pokémon not found`);
+    }
+    return await response.json();
+  } catch (e) {
+    throw e;
   }
-  const json = await response.json();
-  return json;
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: 'center',
     backgroundColor: 'white',
   },
   title: {
@@ -270,8 +299,6 @@ const styles = StyleSheet.create({
   image: {
     width: 150,
     height: 150,
-    padding: 0,
-    margin: 0,
   },
   name: {
     textTransform: 'uppercase',
@@ -280,11 +307,9 @@ const styles = StyleSheet.create({
     fontFamily: 'pokeFontMain',
   },
   type: {
-    fontSize: 28,
     flexDirection: 'row',
-    gap: 5,
     marginTop: 5,
   },
 });
 
-export default HomeScreen;
+export default HomeScreen; //updated code
