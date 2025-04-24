@@ -17,19 +17,20 @@ import * as Font from "expo-font";
 // Given a type (string) return the color hex number associate with type
 export function findBackgroundColor(type: string): string {
   const typeColors: { [type: string]: string } = {
-    normal: "#A8A878",
+    //secondary color from eyedropper tool using firefox (joe), primary/first ones from caleb, swap however you like
+    normal: "#A8A878",//#b9b9a8
     fighting: "#C03028",
-    flying: "#A890F0",
-    poison: "#A040A0",
-    ground: "#E0C068",
+    flying: "#6699ff",//#A890F0
+    poison: "#a040a0",//#A040A0
+    ground: "#E0C068",//#e4c273
     rock: "#B8A038",
-    bug: "#A8B820",
+    bug: "#aabb20",//#A8B820
     ghost: "#705898",
     steel: "#B8B8D0",
     fire: "#F08030",
     water: "#6890F0",
-    grass: "#78C850",
-    electric: "#F8D030",
+    grass: "#48C850",
+    electric: "#F8D030",//#ffdc79
     psychic: "#F85888",
     ice: "#98D8D8",
     dragon: "#7038F8",
