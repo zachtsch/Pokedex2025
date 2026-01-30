@@ -1,5 +1,7 @@
 # Welcome to the Capstone 2025 Pokedex Project!
 
+https://pokedex2025--6xks6oawbw.expo.app/
+
 This is a react native Pokedex project created with Expo Go for Capstone: Software Engineering. We used [https://pokeapi.co/] to fetch the Pokemon data. The app consists of the following components:
 
    1. Main Component
