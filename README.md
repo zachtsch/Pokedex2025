@@ -1,5 +1,7 @@
 # Welcome to the Capstone 2025 Pokedex Project!
 
+This Pokédex app is a student project created for educational purposes. Pokémon data and images are fetched from the public PokéAPI. Pokémon and Pokémon character names are trademarks of Nintendo, Game Freak, and The Pokémon Company. This project is non-commercial and not affiliated with or endorsed by them.
+
 https://pokedex2025--6xks6oawbw.expo.app/
 
 This is a react native Pokedex project created with Expo Go for Capstone: Software Engineering. We used [https://pokeapi.co/] to fetch the Pokemon data. The app consists of the following components:
